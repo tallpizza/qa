@@ -1,5 +1,5 @@
 // QA 도구 진입점. 평소에는 화면에 아무것도 없고, 단축키(PC)·손가락 3개 길게 누르기(휴대폰)로만 나타난다.
-// 흐름: 영역 고르기 → 촬영 → 표시·메모 → 이미지 올리기(Litterbox) → Linear 일감(팀 FAC, 프로젝트 붙임, 상태는 팀 기본=대기).
+// 흐름: 영역 고르기 → 촬영 → 표시·메모 → 이미지 올리기(Litterbox) → Linear 일감(팀·프로젝트 붙임, 시작 상태는 data-state).
 import { capture } from "./capture"
 import { readConfig, type Config } from "./config"
 import { buildReport, describeElement, startErrorCapture, type ElementInfo } from "./context"
@@ -80,7 +80,10 @@ async function init(c: Config) {
   }
 }
 
-if (cfg) {
+// 같은 페이지에 태그가 두 번 들어가도 한 번만 켠다(단축키가 두 번 반응하지 않게)
+const flag = window as unknown as { __qa?: boolean }
+if (cfg && !flag.__qa) {
+  flag.__qa = true
   if (document.body) void init(cfg)
   else document.addEventListener("DOMContentLoaded", () => void init(cfg), { once: true })
 }

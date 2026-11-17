@@ -5,7 +5,7 @@
 ```
 Alt+Shift+Q (맥은 Option+Shift+Q, ⌥⇧Q) / 손가락 3개로 0.7초 길게 누르기(휴대폰)
  → 영역 고르기(▲ 상위 ▼ 하위, 전체 화면) → 촬영 → 펜·화살표·사각형·가리기 + 메모
- → 이미지는 Litterbox(72시간 뒤 삭제)에 올리고, Linear 팀 FAC 에 프로젝트를 붙여 일감 생성(상태는 팀 기본=대기)
+ → 이미지는 Litterbox(72시간 뒤 삭제)에 올리고, Linear 에 팀·프로젝트·시작 상태를 지정해 일감 생성
 ```
 
 서버가 없다. 키는 쓰는 사람의 브라우저(localStorage, 주소마다)에만 저장되고 앱 코드에는 없다. 키가 없으면 도구는 아무 반응도 하지 않는다.
@@ -14,7 +14,7 @@ Alt+Shift+Q (맥은 Option+Shift+Q, ⌥⇧Q) / 손가락 3개로 0.7초 길게 �
 
 ```sh
 pnpm install && pnpm run build
-node scripts/vendor.mjs ../<앱>/public --app <이름> --team <팀 id> --project <프로젝트 id>   # 복사 + <script> 태그 출력
+node scripts/vendor.mjs ../<앱>/public --app <이름> --team <팀 id> --project <프로젝트 id> --state <상태 id>   # 복사 + <script> 태그 출력
 ```
 
 출력된 태그를 앱 `index.html` 에 넣는다. 복사 대신 CDN 으로 불러도 된다: `https://cdn.jsdelivr.net/gh/tallpizza/qa@<태그 또는 커밋>/dist/qa.js` (`@main` 은 캐시가 길어 고정 버전을 권한다). 팀·프로젝트 id 는 Linear 에서 얻는다(비밀값 아님).
@@ -22,6 +22,7 @@ node scripts/vendor.mjs ../<앱>/public --app <이름> --team <팀 id> --project
 | 속성 | 뜻 |
 |---|---|
 | `data-team` · `data-project` | Linear 팀 id(FAC) · 그 앱 프로젝트 id. 필수 |
+| `data-state` | 일감이 시작할 상태 id(예: Backlog). **비우면 Triage 가 켜진 팀에서는 API 일감이 Triage 로 들어간다** |
 | `data-app` | 일감 본문에 적는 앱 이름 |
 | `data-expire` | 이미지 보관 `1h` `12h` `24h` `72h`(기본 72h) |
 | `data-linear-url` · `data-upload-url` | 시험 때 가짜 서버로 바꾼다 |

@@ -4,7 +4,8 @@ const MUTATION = "mutation($i: IssueCreateInput!) { issueCreate(input: $i) { suc
 
 export type Created = { identifier?: string; url?: string }
 
-// 개인 API 키는 Authorization 에 그대로, OAuth 토큰(lin_oauth_)은 Bearer. 상태는 넣지 않아 팀 기본(대기)이 된다.
+// 개인 API 키는 Authorization 에 그대로, OAuth 토큰(lin_oauth_)은 Bearer.
+// 상태를 넣지 않으면 Triage 가 켜진 팀에서는 API 로 만든 일감이 Triage 로 들어가 일감 흐름이 집어 가지 못한다. 시작 상태는 data-state 로 지정한다.
 export async function createIssue(cfg: Config, key: string, title: string, description: string): Promise<Created> {
   const auth = key.startsWith("lin_oauth_") ? `Bearer ${key}` : key
   let res: Response
@@ -12,7 +13,7 @@ export async function createIssue(cfg: Config, key: string, title: string, descr
     res = await fetch(cfg.linearUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: auth },
-      body: JSON.stringify({ query: MUTATION, variables: { i: { teamId: cfg.team, projectId: cfg.project, title, description } } }),
+      body: JSON.stringify({ query: MUTATION, variables: { i: { teamId: cfg.team, projectId: cfg.project, ...(cfg.state ? { stateId: cfg.state } : {}), title, description } } }),
     })
   } catch {
     throw new Error("Linear 에 닿지 못했습니다. 네트워크를 확인해 주세요.")

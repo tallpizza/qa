@@ -11,6 +11,11 @@ createServer((req, res) => {
   const url = new URL(req.url, "http://x")
   if (req.method === "OPTIONS") return res.writeHead(204, cors).end()
   if (req.method === "GET" && url.pathname === "/qa.js") return res.writeHead(200, { ...cors, "content-type": "text/javascript" }).end(readFileSync(new URL("../dist/qa.js", import.meta.url)))
+  // 시험 전용 페이지. /page?state=<상태 id> 로 열면 같은 출처의 /graphql·/upload 로 보내는 위젯이 붙는다
+  if (req.method === "GET" && url.pathname === "/page") {
+    const attrs = `data-team="test-team" data-project="test-project" data-app="fake" data-linear-url="/graphql" data-upload-url="/upload"${url.searchParams.get("state") ? ` data-state="${url.searchParams.get("state")}"` : ""}`
+    return res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(`<!doctype html><meta charset=utf-8><title>시험 페이지</title><body style="font:16px system-ui;padding:24px"><h1>시험 페이지</h1><p>QA 도구 시험용입니다.</p><button id=card style="padding:24px">카드</button><script src="/qa.js" defer ${attrs}></script>`)
+  }
   if (req.method === "GET" && url.pathname === "/log") return res.writeHead(200, { ...cors, "content-type": "application/json" }).end(JSON.stringify(log))
   const chunks = []
   req.on("data", (c) => chunks.push(c))
