@@ -1,0 +1,18 @@
+{
+  "name": "qa-widget",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "type:check": "tsc --noEmit",
+    "vendor": "node scripts/vendor.mjs"
+  },
+  "dependencies": {
+    "@zumer/snapdom": "^3.7.6"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
