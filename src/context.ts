@@ -94,14 +94,14 @@ export function describeElement(el: Element): ElementInfo {
   }
 }
 
-export type ReportInput = { app: string; note: string; imageUrl?: string; expire: string; target?: ElementInfo }
+export type ReportInput = { app: string; note: string; imageUrl?: string; target?: ElementInfo }
 
-export function buildReport({ app, note, imageUrl, expire, target }: ReportInput): { title: string; description: string } {
+export function buildReport({ app, note, imageUrl, target }: ReportInput): { title: string; description: string } {
   const firstLine = note.split("\n").map((l) => l.trim()).find(Boolean)
   const title = clip(firstLine ?? `화면 확인 요청: ${location.pathname}`, 60)
   const dpr = window.devicePixelRatio || 1
   const agent = [
-    imageUrl ? `- 스크린샷: ${imageUrl} (${expire} 뒤 사라진다. 일감을 읽는 즉시 curl 로 받아 Read 로 본다)` : "- 스크린샷: 올리지 못했다",
+    imageUrl ? `- 스크린샷: ${imageUrl} (Linear 공개 이미지. curl 로 받아 Read 로 본다)` : "- 스크린샷: 올리지 못했다",
     `- 주소: ${location.href}`,
     target
       ? `- 선택한 영역: \`${target.selector}\`${target.component ? ` · 컴포넌트 ${target.component}` : ""} · 위치 ${target.rect.x},${target.rect.y} 크기 ${target.rect.w}×${target.rect.h}${target.text ? ` · 글자 "${target.text}"` : ""}`

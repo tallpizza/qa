@@ -4,10 +4,12 @@ const MUTATION = "mutation($i: IssueCreateInput!) { issueCreate(input: $i) { suc
 
 export type Created = { identifier?: string; url?: string }
 
-// 개인 API 키는 Authorization 에 그대로, OAuth 토큰(lin_oauth_)은 Bearer.
+// 개인 API 키는 Authorization 에 그대로, OAuth 토큰(lin_oauth_)은 Bearer. 이미지 올리는 서버에도 같은 값을 넘긴다
+export const authHeader = (key: string) => (key.startsWith("lin_oauth_") ? `Bearer ${key}` : key)
+
 // 상태를 넣지 않으면 Triage 가 켜진 팀에서는 API 로 만든 일감이 Triage 로 들어가 일감 흐름이 집어 가지 못한다. 시작 상태는 data-state 로 지정한다.
 export async function createIssue(cfg: Config, key: string, title: string, description: string): Promise<Created> {
-  const auth = key.startsWith("lin_oauth_") ? `Bearer ${key}` : key
+  const auth = authHeader(key)
   let res: Response
   try {
     res = await fetch(cfg.linearUrl, {

@@ -1,10 +1,10 @@
 // QA 도구 진입점. 평소에는 화면에 아무것도 없고, 단축키(PC)·손가락 3개 길게 누르기(휴대폰)로만 나타난다.
-// 흐름: 영역 고르기 → 촬영 → 표시·메모 → 이미지 올리기(Litterbox) → Linear 일감(팀·프로젝트 붙임, 시작 상태는 data-state).
+// 흐름: 영역 고르기 → 촬영 → 표시·메모 → 이미지 올리기(이미지 올리는 서버 → Linear 공개 이미지) → Linear 일감(팀·프로젝트 붙임, 시작 상태는 data-state).
 import { capture } from "./capture"
 import { readConfig, type Config } from "./config"
 import { buildReport, describeElement, startErrorCapture, type ElementInfo } from "./context"
 import { openEditor } from "./editor"
-import { createIssue } from "./linear"
+import { authHeader, createIssue } from "./linear"
 import { pickArea } from "./pick"
 import { openSetup } from "./setup"
 import { getKey } from "./store"
@@ -36,14 +36,9 @@ async function run(c: Config) {
       const key = getKey()
       if (!key) throw new Error("키가 없습니다. 주소 끝에 ?qa=setup 을 붙여 넣어 주세요.")
       progress("이미지를 올리는 중…")
-      let imageUrl: string | undefined
-      try {
-        imageUrl = await uploadImage(c, blob)
-      } catch (e) {
-        throw new Error(`${e instanceof Error ? e.message : "이미지를 올리지 못했습니다."} 다시 보내 보세요.`)
-      }
+      const imageUrl = await uploadImage(c, authHeader(key), blob)
       progress("일감을 만드는 중…")
-      const { title, description } = buildReport({ app: c.app, note, imageUrl, expire: c.expire.replace("h", "시간"), target: info })
+      const { title, description } = buildReport({ app: c.app, note, imageUrl, target: info })
       const made = await createIssue(c, key, title, description)
       return made.identifier ? `${made.identifier} 일감으로 보냈습니다` : "일감으로 보냈습니다"
     })
