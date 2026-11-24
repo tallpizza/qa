@@ -1,0 +1,4 @@
+{
+  "worktree": { "setup": "pnpm install --frozen-lockfile" },
+  "scripts": { "typecheck": { "command": "pnpm run type:check" } }
+}
