@@ -104,7 +104,7 @@ export function openEditor(base: HTMLCanvasElement, send: (blob: Blob, note: str
       status.className = "status"
       sendBtn.textContent = "보내는 중…"
       try {
-        const blob = await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("이미지를 만들지 못했습니다."))), "image/png"))
+        const blob = await encode(canvas)
         const done = await send(blob, note.value, (m) => (status.textContent = m))
         close(done)
       } catch (err) {
@@ -150,4 +150,15 @@ function draw(ctx: CanvasRenderingContext2D, s: Shape, lw: number) {
     ctx.fill()
   }
   ctx.restore()
+}
+
+// QA 서버(Vercel)는 4MB 넘는 본문을 받지 못한다. PNG 가 크면 WebP, 그래도 크면 JPEG 로 줄인다
+const LIMIT = 4 * 1024 * 1024
+async function encode(canvas: HTMLCanvasElement): Promise<Blob> {
+  const as = (type: string, q?: number) => new Promise<Blob | null>((res) => canvas.toBlob(res, type, q))
+  for (const [type, q] of [["image/png"], ["image/webp", 0.9], ["image/jpeg", 0.85], ["image/jpeg", 0.6]] as const) {
+    const b = await as(type, q)
+    if (b && b.type === type && b.size <= LIMIT) return b
+  }
+  throw new Error("이미지가 너무 큽니다. 더 작은 영역을 골라 주세요.")
 }
