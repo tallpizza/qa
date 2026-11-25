@@ -1,11 +1,14 @@
 // QA 서버. 위젯이 보낸 그림과 일감을 프로젝트(엔드포인트)별 Linear 키로 Linear 에 넣는다. Vercel 에서 돈다(api/index.mjs).
-// 키는 위젯·브라우저에 없다. 프로젝트 설정(팀·프로젝트·시작 상태·허용 출처)은 projects.json, 키는 환경변수 QA_KEY_<프로젝트 이름>(대문자, - 는 _).
+// 키는 위젯·브라우저에 없다. 프로젝트 설정(팀·프로젝트·시작 상태·허용 출처)은 projects.json, 키는 팀마다 환경변수 QA_KEY_<팀 키>(예: QA_KEY_FAC).
+// Linear 개인 API 키는 팀 단위로만 권한을 나눌 수 있어 키도 팀마다 하나다.
 //   GET  /health
 //   POST /p/<프로젝트>/upload  본문: 그림 바이트(image/png·jpeg·webp) → 200 {"url": Linear 공개 이미지 주소}
 //   POST /p/<프로젝트>/issue   본문: {"title","description"} → 200 {"identifier","url"}
 //   실패 → 4xx·5xx {"error": 사람이 읽는 문구}
 // 엔드포인트 주소는 앱 페이지 소스에 보이므로, 브라우저 Origin 이 그 프로젝트의 허용 출처가 아니면 거절한다.
-import projects from "../projects.json" with { type: "json" }
+import config from "../projects.json" with { type: "json" }
+
+const { teams, projects } = config
 
 const LINEAR = process.env.QA_LINEAR_URL ?? "https://api.linear.app/graphql"
 const MAX_MB = 4 // Vercel 함수 요청 본문 한도(4.5MB) 아래
@@ -74,7 +77,7 @@ async function upload(key, req) {
 async function issue(key, p, req) {
   const b = await req.json().catch(() => null)
   if (typeof b?.title !== "string" || !b.title.trim() || typeof b.description !== "string") throw new Fail(400, "제목과 본문이 필요합니다.")
-  const input = { teamId: p.team, projectId: p.project, ...(p.state ? { stateId: p.state } : {}), title: b.title.slice(0, 250), description: b.description }
+  const input = { teamId: teams[p.team], projectId: p.project, ...(p.state ? { stateId: p.state } : {}), title: b.title.slice(0, 250), description: b.description }
   const made = (await linear(key, ISSUE, { i: input }))?.issueCreate
   if (!made?.success) throw new Fail(502, "Linear 가 일감을 받지 않았습니다. 다시 보내 보세요.")
   return { identifier: made.issue?.identifier, url: made.issue?.url }
@@ -95,8 +98,8 @@ export async function handle(req) {
   if (req.method !== "POST") return json(405, { error: "POST 만 받습니다." }, cors)
   try {
     if (!ok) throw new Fail(403, `이 화면 주소(${origin || "출처 없음"})는 QA 서버의 ${m[1]} 허용 목록에 없습니다.`)
-    const key = process.env[keyEnv(m[1])]
-    if (!key) throw new Fail(503, `QA 서버에 ${m[1]} 의 Linear 키가 아직 없습니다. 관리자에게 알려 주세요.`)
+    const key = process.env[keyEnv(p.team)]
+    if (!key) throw new Fail(503, `QA 서버에 ${p.team} 팀의 Linear 키가 아직 없습니다. 관리자에게 알려 주세요.`)
     const out = m[2] === "upload" ? await upload(key, req) : await issue(key, p, req)
     console.log(`${m[1]} ${m[2]} ${origin}`)
     return json(200, out, cors)

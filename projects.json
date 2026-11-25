@@ -1,14 +1,29 @@
 {
-  "graph-note": {
-    "team": "488f0412-4913-4404-9bc8-6b2a68fc07cd",
-    "project": "d01a9eea-362d-4b8e-9621-99f3732568e7",
-    "state": "01e21774-58e8-4b4a-9af8-c366ce8583b0",
-    "origins": ["https://macmini.taild233e3.ts.net", "http://macmini:*", "http://localhost:*", "http://127.0.0.1:*"]
+  "teams": {
+    "FAC": "488f0412-4913-4404-9bc8-6b2a68fc07cd"
   },
-  "lg-clinic-dashboard": {
-    "team": "488f0412-4913-4404-9bc8-6b2a68fc07cd",
-    "project": "9a5f64cc-d98b-42c6-9f1d-1c35fc887951",
-    "state": "01e21774-58e8-4b4a-9af8-c366ce8583b0",
-    "origins": ["https://lg-dashboard.codestep.co.kr", "http://macmini:*", "http://localhost:*", "http://127.0.0.1:*"]
+  "projects": {
+    "graph-note": {
+      "team": "FAC",
+      "project": "d01a9eea-362d-4b8e-9621-99f3732568e7",
+      "state": "01e21774-58e8-4b4a-9af8-c366ce8583b0",
+      "origins": [
+        "https://macmini.taild233e3.ts.net",
+        "http://macmini:*",
+        "http://localhost:*",
+        "http://127.0.0.1:*"
+      ]
+    },
+    "lg-clinic-dashboard": {
+      "team": "FAC",
+      "project": "9a5f64cc-d98b-42c6-9f1d-1c35fc887951",
+      "state": "01e21774-58e8-4b4a-9af8-c366ce8583b0",
+      "origins": [
+        "https://lg-dashboard.codestep.co.kr",
+        "http://macmini:*",
+        "http://localhost:*",
+        "http://127.0.0.1:*"
+      ]
+    }
   }
 }

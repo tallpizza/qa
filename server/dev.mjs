@@ -1,5 +1,5 @@
 // 로컬에서 QA 서버를 띄운다(시험용). Vercel 과 같은 handle 을 node http 로 감싼다.
-//   QA_LINEAR_URL=http://localhost:5399/graphql QA_KEY_GRAPH_NOTE=test node server/dev.mjs [포트=5398]
+//   QA_LINEAR_URL=http://localhost:5399/graphql QA_KEY_FAC=test node server/dev.mjs [포트=5398]
 import { createServer } from "node:http"
 import { handle } from "./handler.mjs"
 
